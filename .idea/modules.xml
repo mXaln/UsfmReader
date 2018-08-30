@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UsfmReader.iml" filepath="$PROJECT_DIR$/.idea/modules/UsfmReader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UsfmReader_main.iml" filepath="$PROJECT_DIR$/.idea/modules/UsfmReader_main.iml" group="UsfmReader" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/UsfmReader_test.iml" filepath="$PROJECT_DIR$/.idea/modules/UsfmReader_test.iml" group="UsfmReader" />
+    </modules>
+  </component>
+</project>
