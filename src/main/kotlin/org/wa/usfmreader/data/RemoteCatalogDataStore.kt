@@ -19,23 +19,23 @@ class RemoteCatalogDataStore(private val api: Api,
     }
 
     override fun getLanguage(langSlug: String): Observable<LanguageEntity> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getBooks(langSlug: String): Observable<List<BookEntity>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getBook(bookSlug: String): Observable<BookEntity> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getChapters(bookSlug: String): Observable<List<ChapterEntity>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getChapter(number: Int): Observable<ChapterEntity> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
     override fun getBookUsfm(bookSlug: String): Observable<String> {
