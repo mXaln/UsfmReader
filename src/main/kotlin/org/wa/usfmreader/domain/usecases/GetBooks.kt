@@ -1,24 +1,11 @@
 package org.wa.usfmreader.domain.usecases
 
 import io.reactivex.Observable
-import org.wa.usfmreader.domain.CatalogRepository
-import org.wa.usfmreader.domain.Transformer
-import org.wa.usfmreader.domain.entities.BookEntity
+import org.wa.usfmreader.data.entities.BookData
+import org.wa.usfmreader.persistence.CatalogRepository
 
-open class GetBooks(transformer: Transformer<List<BookEntity>>,
-                    private val repository: CatalogRepository) : UseCase<List<BookEntity>>(transformer) {
-
-    fun getBooks(slug: String): Observable<List<BookEntity>> {
-        val data = HashMap<String, String>()
-        data["slug"] = slug
-        return observable(data)
+open class GetBooks(private val repository: CatalogRepository): BaseUsecase<List<BookData>> {
+    override fun createObservable(data: Any?): Observable<List<BookData>> {
+        return repository.getBooks(data as String)
     }
-
-    override fun createObservable(data: Map<String, Any>?): Observable<List<BookEntity>> {
-        val slug = data?.get("slug")
-        slug?.let {
-            return repository.getBooks(it as String)
-        } ?: return Observable.error { IllegalArgumentException("Language slug must be provided.") }
-    }
-
 }

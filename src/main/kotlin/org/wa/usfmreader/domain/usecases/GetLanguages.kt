@@ -1,14 +1,11 @@
 package org.wa.usfmreader.domain.usecases
 
 import io.reactivex.Observable
-import org.wa.usfmreader.domain.CatalogRepository
-import org.wa.usfmreader.domain.Transformer
-import org.wa.usfmreader.domain.entities.LanguageEntity
+import org.wa.usfmreader.data.entities.LanguageData
+import org.wa.usfmreader.persistence.CatalogRepository
 
-open class GetLanguages(transformer: Transformer<List<LanguageEntity>>,
-                            private val repository: CatalogRepository) : UseCase<List<LanguageEntity>>(transformer) {
-    override fun createObservable(data: Map<String, Any>?): Observable<List<LanguageEntity>> {
+open class GetLanguages(private val repository: CatalogRepository): BaseUsecase<List<LanguageData>> {
+    override fun createObservable(data: Any?): Observable<List<LanguageData>> {
         return repository.getLanguages()
     }
-
 }
