@@ -36,6 +36,7 @@ dependencies {
 
     compile 'com.squareup.moshi:moshi:1.6.0'
     compile 'com.squareup.retrofit2:converter-moshi:2.4.0'
+    compile 'com.squareup.retrofit2:converter-scalars:2.4.0'
 
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
 

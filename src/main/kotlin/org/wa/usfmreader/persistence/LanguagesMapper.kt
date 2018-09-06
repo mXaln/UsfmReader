@@ -12,7 +12,7 @@ class LanguagesMapper: Mapper<LanguageResult, LanguageData>() {
             direction = from.direction,
             books = from.resources
                     .filter { it.identifier == "ulb" }
-                    .flatMap { recourceResult -> recourceResult.projects
+                    .flatMap { resourceResult -> resourceResult.projects
                             .map { mapper.mapFrom(it) } }
 
         )

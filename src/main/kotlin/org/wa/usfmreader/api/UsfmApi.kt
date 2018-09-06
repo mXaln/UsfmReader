@@ -5,6 +5,9 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
+
+const val USFM_BASE_URL = "https://api.door43.org/"
 
 class UsfmApi {
     var usfmClient: UsfmClient
@@ -13,8 +16,9 @@ class UsfmApi {
         val httpClient = OkHttpClient.Builder()
         val builder =
                 Retrofit.Builder()
+                        .baseUrl(USFM_BASE_URL)
                         .addConverterFactory(
-                                MoshiConverterFactory.create()
+                                ScalarsConverterFactory.create()
                         ).addCallAdapterFactory(
                                 RxJava2CallAdapterFactory.create()
                         )

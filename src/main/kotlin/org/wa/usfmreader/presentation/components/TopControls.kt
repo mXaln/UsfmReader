@@ -1,17 +1,13 @@
 package org.wa.usfmreader.presentation.components
 
-import io.reactivex.Observable
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler
-import javafx.beans.property.SimpleObjectProperty
-import javafx.collections.FXCollections
+import io.reactivex.schedulers.Schedulers
 import javafx.collections.ObservableList
 import javafx.scene.control.ComboBox
+import javafx.scene.text.FontWeight
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.ChapterData
 import org.wa.usfmreader.data.entities.LanguageData
-import org.wa.usfmreader.presentation.model.Book
-import org.wa.usfmreader.presentation.model.Chapter
-import org.wa.usfmreader.presentation.model.Language
 import org.wa.usfmreader.presentation.viewmodel.BookViewModel
 import org.wa.usfmreader.presentation.viewmodel.ChapterViewModel
 import org.wa.usfmreader.presentation.viewmodel.LanguageViewModel
@@ -19,82 +15,107 @@ import tornadofx.*
 
 class TopControls : View("Top") {
 
-    val selectedLanguage = SimpleObjectProperty<Language>()
-    val selectedBook = SimpleObjectProperty<Book>()
-    val selectedChapter = SimpleObjectProperty<Chapter>()
+    val selectedLanguage: LanguageViewModel by inject()
+    val selectedBook: BookViewModel by inject()
+    val selectedChapter: ChapterViewModel by inject()
 
-    val languageViewModel = LanguageViewModel(selectedLanguage)
-    val bookViewModel = BookViewModel(selectedBook)
-    val chapterViewModel = ChapterViewModel(selectedChapter)
+    lateinit var languagesCombobox: ComboBox<LanguageData>
+    lateinit var booksCombobox: ComboBox<BookData>
+    lateinit var chaptersCombobox: ComboBox<ChapterData>
 
-    lateinit var languagesCombobox: ComboBox<Language>
-    lateinit var booksCombobox: ComboBox<Book>
-    lateinit var chaptersCombobox: ComboBox<Chapter>
-
-    val languages: ObservableList<Language> =
-            mutableListOf<Language>().observable()
+    val languages: ObservableList<LanguageData> =
+            mutableListOf<LanguageData>().observable()
 
     init {
-        languageViewModel.getLanguages()
+        selectedLanguage.getLanguages()
                 .observeOn(JavaFxScheduler.platform())
+                .subscribeOn(Schedulers.computation())
                 .subscribe { it ->
                     val newLangs = it
                             .sortedBy { it.name }
-                            .map {
-                        Language(
-                                slug = it.slug,
-                                name = it.name,
-                                direction = it.direction,
-                                books = it.books
-                                        .sortedBy { it.sort }
-                                        .map {
-                                    Book(
-                                            slug = it.slug,
-                                            name = it.name,
-                                            sort = it.sort,
-                                            usfmUrl = it.usfmUrl,
-                                            chapters = it.chapters.map {
-                                                Chapter(
-                                                        number = it.number,
-                                                        text = it.text
-                                                )
-                                            }.observable()
-                                    )
-                                }.observable()
-                        )
-                    }
 
                     languages.clear()
                     languages.addAll(newLangs)
                 }
+
     }
 
     override val root = hbox {
         spacing = 20.0
 
-        languagesCombobox = combobox(selectedLanguage, languages) {
-            selectionModel.selectFirst()
-            cellFormat {
-                text = it.name
+        vbox {
+            label("Select language:") {
+                style {
+                    fontWeight = FontWeight.BOLD
+                }
             }
-            selectionModel.selectedItemProperty().onChange {
-                booksCombobox.selectionModel.selectFirst()
-                chaptersCombobox.selectionModel.selectFirst()
+            languagesCombobox = combobox {
+                items = languages
+                bind(selectedLanguage.itemProperty)
+
+                cellFormat {
+                    text = it.name
+                }
+                selectionModel.selectedItemProperty().onChange {
+                    booksCombobox.items = it?.books?.observable()
+                }
+                useMaxWidth = true
             }
         }
-        booksCombobox = combobox(selectedBook, languageViewModel.books as List<Book>) {
-            selectionModel.selectFirst()
-            cellFormat {
-                text = it.name
+
+        vbox {
+            label("Select book:") {
+                style {
+                    fontWeight = FontWeight.BOLD
+                }
             }
-            selectionModel.selectedItemProperty().onChange {
-                chaptersCombobox.selectionModel.selectFirst()
+            booksCombobox = combobox {
+                items = selectedLanguage.books.value
+                bind(selectedBook.itemProperty)
+
+                cellFormat {
+                    text = it.name
+                }
+                selectionModel.selectedItemProperty().onChange {
+                    if (it != null) {
+                        selectedChapter.text.value = ""
+                        selectedBook.getBook(it)
+                                .observeOn(JavaFxScheduler.platform())
+                                .subscribeOn(Schedulers.computation())
+                                .subscribe {
+                                    selectedBook.item = it
+                                    chaptersCombobox.items = it?.chapters?.observable()
+                                    chaptersCombobox.selectionModel.selectFirst()
+                                }
+                    }
+                    else {
+                        chaptersCombobox.items = listOf<ChapterData>().observable()
+                    }
+                }
+                useMaxWidth = true
+                disableWhen { selectedLanguage.empty }
             }
         }
-        chaptersCombobox = combobox(selectedChapter, bookViewModel.chapters as List<Chapter>) {
-            selectionModel.selectFirst()
-            cellFormat {
-                text = it.number.toString()
+
+        vbox {
+            label("Select chapter:") {
+                style {
+                    fontWeight = FontWeight.BOLD
+                }
+            }
+            chaptersCombobox = combobox {
+                items = selectedBook.chapters.value
+                bind(selectedChapter.itemProperty)
+
+                cellFormat {
+                    text = it.number.toString()
+                }
+                selectionModel.selectedItemProperty().onChange {
+                    selectedChapter.item = it
+                }
+                useMaxWidth = true
+
+                disableWhen { selectedBook.empty }
             }
         }
     }

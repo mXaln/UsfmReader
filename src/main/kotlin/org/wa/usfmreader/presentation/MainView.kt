@@ -8,7 +8,7 @@ import org.wa.usfmreader.presentation.components.ChapterContent
 import org.wa.usfmreader.presentation.components.TopControls
 import tornadofx.*
 
-class MainView : View("Hello TornadoFX") {
+class MainView : View("Bible Reader") {
     override val root = BorderPane()
 
     private val topControls: TopControls by inject()
@@ -28,7 +28,7 @@ class MainView : View("Hello TornadoFX") {
         }
 
         root.center = chapterContent.root.apply {
-            alignment = Pos.BASELINE_CENTER
+            alignment = Pos.TOP_CENTER
             borderpaneConstraints {
                 margin = Insets(0.0, 20.0, 0.0, 20.0)
             }
