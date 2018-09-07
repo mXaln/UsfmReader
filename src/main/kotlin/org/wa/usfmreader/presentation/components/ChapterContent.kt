@@ -14,7 +14,7 @@ class ChapterContent : View("Chapter") {
 
     override val root = vbox {
         hbox {
-            spacing = 20.0
+            spacing = 2.0
             alignment = Pos.TOP_CENTER
             style {
                 fontWeight = FontWeight.BOLD

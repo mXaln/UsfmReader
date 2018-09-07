@@ -12,4 +12,28 @@ class ChapterViewModel(chapterData: ChapterData? = null): ItemViewModel<ChapterD
     val text = bind(autocommit = true) {
         SimpleStringProperty(item?.text ?: "")
     }
+
+    val selectedBook: BookViewModel by inject()
+
+    fun getNextChapter(): ChapterData {
+        val nextChapter = selectedBook.item.chapters
+                .singleOrNull { it.number == item.number + 1 }
+
+        if (nextChapter != null) {
+            return nextChapter
+        }
+
+        return item
+    }
+
+    fun getPreviousChapter(): ChapterData {
+        val prevChapter = selectedBook.item.chapters
+                .singleOrNull { it.number == item.number - 1 }
+
+        if (prevChapter != null) {
+            return prevChapter
+        }
+
+        return item
+    }
 }

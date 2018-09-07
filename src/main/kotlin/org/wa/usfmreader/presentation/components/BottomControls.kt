@@ -12,9 +12,15 @@ class BottomControls : View("Bottom") {
             disableWhen {
                 selectedChapter.empty
             }
+            action {
+                selectedChapter.item = selectedChapter.getPreviousChapter()
+            }
         }
         button("Next") {
             disableWhen { selectedChapter.empty }
+            action {
+                selectedChapter.item = selectedChapter.getNextChapter()
+            }
         }
     }
 }

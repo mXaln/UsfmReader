@@ -10,19 +10,19 @@ class BookUsecase(private val repository: UsfmRepository) {
         return parse(data, repository.getBookUsfm(data.usfmUrl))
     }
 
-    fun parse(book: BookData, usfm: Observable<String>): Observable<BookData> {
+    private fun parse(book: BookData, usfm: Observable<String>): Observable<BookData> {
         return usfm.map {
             book.chapters = getChapters(it)
             book
         }
     }
 
-    fun isChapterTag(text: String): Boolean {
+    private fun isChapterTag(text: String): Boolean {
         val regex = """\\c\s[0-9]+""".toRegex()
         return regex.matches(text)
     }
 
-    fun getChapterNumber(text: String): Int {
+    private fun getChapterNumber(text: String): Int {
         val regex = """\\c\s([0-9]+)""".toRegex()
         val result = regex.find(text)
 
@@ -33,12 +33,12 @@ class BookUsecase(private val repository: UsfmRepository) {
         return 0
     }
 
-    fun isVerseTag(text: String): Boolean {
+    private fun isVerseTag(text: String): Boolean {
         val regex = """\\v\s[0-9]+""".toRegex()
         return regex.containsMatchIn(text)
     }
 
-    fun getVerseNumber(text: String): Int {
+    private fun getVerseNumber(text: String): Int {
         val regex = """\\v\s([0-9]+)""".toRegex()
         val result = regex.find(text)
 
@@ -49,7 +49,7 @@ class BookUsecase(private val repository: UsfmRepository) {
         return 0
     }
 
-    fun getVerseText(text: String): String {
+    private fun getVerseText(text: String): String {
         val regex = """\\v\s[0-9]+(.*)""".toRegex()
         val result = regex.find(text)
 
@@ -60,7 +60,17 @@ class BookUsecase(private val repository: UsfmRepository) {
         return ""
     }
 
-    fun getChapters(usfm: String): List<ChapterData> {
+    private fun processFootnotes(text: String): String {
+        val regex = """\\f(?:\s\+\s\\f[a-z]+)?\s(.*)\s\\f\*""".toRegex()
+        val regex2 = """\\fqa\s(.*)\s\\fqa\*""".toRegex()
+        return regex.replace(text) {
+            regex2.replace("«${it.groupValues[1]}»") {
+                "\"${it.groupValues[1]}\""
+            }
+        }
+    }
+
+    private fun getChapters(usfm: String): List<ChapterData> {
         val regex = """\n\r|\n|\r""".toRegex()
         val lines = regex.split(usfm)
         val chapters = mutableListOf<ChapterData>()
@@ -81,7 +91,10 @@ class BookUsecase(private val repository: UsfmRepository) {
 
             if (isVerseTag(line)) {
                 if (chapter != null) {
-                    chapter.text += "${getVerseNumber(line)}. ${getVerseText(line)} "
+                    var verse = "${getVerseNumber(line)}. ${getVerseText(line)} "
+                    verse = processFootnotes(verse)
+
+                    chapter.text += verse
                 }
             }
         }

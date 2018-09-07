@@ -11,7 +11,7 @@ class LanguagesMapper: Mapper<LanguageResult, LanguageData>() {
             name = from.title,
             direction = from.direction,
             books = from.resources
-                    .filter { it.identifier == "ulb" }
+                    .filter { listOf("ulb","avd").contains(it.identifier) }
                     .flatMap { resourceResult -> resourceResult.projects
                             .map { mapper.mapFrom(it) } }
 
