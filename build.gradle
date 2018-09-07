@@ -26,16 +26,21 @@ repositories {
 }
 
 dependencies {
-    compile 'no.tornado:tornadofx:1.7.14'
-    testCompile 'junit:junit:4.12'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile 'no.tornado:tornadofx:1.7.14'
 
-    compile 'com.github.thomasnield:rxkotlinfx:2.2.2'
     compile 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+    compile 'com.github.thomasnield:rxkotlinfx:2.2.2'
 
     compile 'com.squareup.retrofit2:retrofit:2.4.0'
 
     compile 'com.squareup.moshi:moshi:1.6.0'
+    compile 'com.squareup.retrofit2:converter-moshi:2.4.0'
+    compile 'com.squareup.retrofit2:converter-scalars:2.4.0'
+
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
+
+    testCompile 'junit:junit:4.12'
 }
 
 mainClassName = 'org.wa.usfmreader.app.MyApp'
