@@ -1,25 +1,25 @@
-package org.wa.usfmreader.presentation.components
+package org.wa.usfmreader.presentation.views
 
 import org.wa.usfmreader.presentation.viewmodel.ChapterViewModel
 import tornadofx.*
 
 class BottomControls : View("Bottom") {
-    val selectedChapter: ChapterViewModel by inject()
+    private val chapterViewModel: ChapterViewModel by inject()
 
     override val root = hbox {
         spacing = 20.0
         button("Previous") {
             disableWhen {
-                selectedChapter.empty
+                chapterViewModel.empty
             }
             action {
-                selectedChapter.item = selectedChapter.getPreviousChapter()
+                chapterViewModel.item = chapterViewModel.getPreviousChapter()
             }
         }
         button("Next") {
-            disableWhen { selectedChapter.empty }
+            disableWhen { chapterViewModel.empty }
             action {
-                selectedChapter.item = selectedChapter.getNextChapter()
+                chapterViewModel.item = chapterViewModel.getNextChapter()
             }
         }
     }

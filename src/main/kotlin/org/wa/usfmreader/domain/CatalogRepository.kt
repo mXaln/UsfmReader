@@ -1,4 +1,4 @@
-package org.wa.usfmreader.persistence
+package org.wa.usfmreader.domain
 
 import io.reactivex.Observable
 import org.wa.usfmreader.data.entities.LanguageData

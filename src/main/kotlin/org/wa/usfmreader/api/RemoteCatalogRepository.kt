@@ -1,15 +1,12 @@
-package org.wa.usfmreader.persistence
+package org.wa.usfmreader.api
 
 import io.reactivex.Observable
-import org.wa.usfmreader.api.CatalogApi
 import org.wa.usfmreader.data.entities.LanguageData
+import org.wa.usfmreader.domain.CatalogRepository
 
 class RemoteCatalogRepository(private val api: CatalogApi): CatalogRepository {
 
     override fun getLanguages(): Observable<List<LanguageData>> {
-        val mapper = LanguagesMapper()
-        return api.getLanguages().map { results ->
-            results.languages.map { mapper.mapFrom(it) }
-        }
+        return api.getLanguages()
     }
 }

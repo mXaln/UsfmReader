@@ -1,4 +1,4 @@
-package org.wa.usfmreader.persistence
+package org.wa.usfmreader.api.mappers
 
 import io.reactivex.Observable
 

@@ -2,6 +2,8 @@ package org.wa.usfmreader.presentation.viewmodel
 
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.collections.ObservableList
+import javafx.scene.control.ComboBox
 import org.wa.usfmreader.data.entities.ChapterData
 import tornadofx.*
 
@@ -13,10 +15,16 @@ class ChapterViewModel(chapterData: ChapterData? = null): ItemViewModel<ChapterD
         SimpleStringProperty(item?.text ?: "")
     }
 
-    val selectedBook: BookViewModel by inject()
+    val chapters: ObservableList<ChapterData> =
+            mutableListOf<ChapterData>().observable()
+
+    lateinit var comboBox: ComboBox<ChapterData>
+
+    val bookViewModel: BookViewModel by inject()
+    val bookEmpty = bookViewModel.empty
 
     fun getNextChapter(): ChapterData {
-        val nextChapter = selectedBook.item.chapters
+        val nextChapter = bookViewModel.item.chapters
                 .singleOrNull { it.number == item.number + 1 }
 
         if (nextChapter != null) {
@@ -27,7 +35,7 @@ class ChapterViewModel(chapterData: ChapterData? = null): ItemViewModel<ChapterD
     }
 
     fun getPreviousChapter(): ChapterData {
-        val prevChapter = selectedBook.item.chapters
+        val prevChapter = bookViewModel.item.chapters
                 .singleOrNull { it.number == item.number - 1 }
 
         if (prevChapter != null) {
@@ -35,5 +43,13 @@ class ChapterViewModel(chapterData: ChapterData? = null): ItemViewModel<ChapterD
         }
 
         return item
+    }
+
+    fun selectFirst() {
+        comboBox.selectionModel.selectFirst()
+    }
+
+    fun clear() {
+        comboBox.items.clear()
     }
 }

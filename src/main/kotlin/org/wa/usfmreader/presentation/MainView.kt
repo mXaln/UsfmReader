@@ -3,9 +3,9 @@ package org.wa.usfmreader.presentation
 import javafx.geometry.Insets
 import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
-import org.wa.usfmreader.presentation.components.BottomControls
-import org.wa.usfmreader.presentation.components.ChapterContent
-import org.wa.usfmreader.presentation.components.TopControls
+import org.wa.usfmreader.presentation.views.BottomControls
+import org.wa.usfmreader.presentation.views.ChapterContent
+import org.wa.usfmreader.presentation.views.TopControls
 import tornadofx.*
 
 class MainView : View("Bible Reader") {

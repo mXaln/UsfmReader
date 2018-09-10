@@ -3,14 +3,15 @@ package org.wa.usfmreader.domain.usecases
 import io.reactivex.Observable
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.ChapterData
-import org.wa.usfmreader.persistence.UsfmRepository
+import org.wa.usfmreader.domain.UsfmRepository
 
 class BookUsecase(private val repository: UsfmRepository) {
-    fun getBook(data: BookData): Observable<BookData> {
-        return parse(data, repository.getBookUsfm(data.usfmUrl))
+    fun getBookWithChapters(book: BookData): Observable<BookData> {
+        return parse(book)
     }
 
-    private fun parse(book: BookData, usfm: Observable<String>): Observable<BookData> {
+    private fun parse(book: BookData): Observable<BookData> {
+        val usfm = repository.getBookUsfm(book)
         return usfm.map {
             book.chapters = getChapters(it)
             book
@@ -19,7 +20,7 @@ class BookUsecase(private val repository: UsfmRepository) {
 
     private fun isChapterTag(text: String): Boolean {
         val regex = """\\c\s[0-9]+""".toRegex()
-        return regex.matches(text)
+        return regex.containsMatchIn(text)
     }
 
     private fun getChapterNumber(text: String): Int {
