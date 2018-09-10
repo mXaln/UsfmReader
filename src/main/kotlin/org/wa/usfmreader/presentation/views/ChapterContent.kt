@@ -1,8 +1,7 @@
-package org.wa.usfmreader.presentation.components
+package org.wa.usfmreader.presentation.views
 
 import javafx.geometry.Pos
 import javafx.scene.control.ScrollPane
-import javafx.scene.image.ImageView
 import javafx.scene.text.FontWeight
 import org.wa.usfmreader.presentation.viewmodel.BookViewModel
 import org.wa.usfmreader.presentation.viewmodel.ChapterViewModel
