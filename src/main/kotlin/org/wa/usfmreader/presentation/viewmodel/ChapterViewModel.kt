@@ -18,7 +18,7 @@ class ChapterViewModel(chapterData: ChapterData? = null): ItemViewModel<ChapterD
     val chapters: ObservableList<ChapterData> =
             mutableListOf<ChapterData>().observable()
 
-    lateinit var comboBox: ComboBox<ChapterData>
+    var comboBox: ComboBox<ChapterData> by singleAssign()
 
     val bookViewModel: BookViewModel by inject()
     val bookEmpty = bookViewModel.empty

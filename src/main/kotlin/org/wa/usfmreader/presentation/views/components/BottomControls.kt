@@ -1,4 +1,4 @@
-package org.wa.usfmreader.presentation.views
+package org.wa.usfmreader.presentation.views.components
 
 import org.wa.usfmreader.presentation.viewmodel.ChapterViewModel
 import tornadofx.*

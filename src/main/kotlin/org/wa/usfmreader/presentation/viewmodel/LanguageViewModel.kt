@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleListProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
+import javafx.scene.control.ComboBox
 import org.wa.usfmreader.api.CatalogApi
 import org.wa.usfmreader.api.RemoteCatalogRepository
 import org.wa.usfmreader.data.entities.BookData
