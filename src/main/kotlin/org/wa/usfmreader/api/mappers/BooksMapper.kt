@@ -10,7 +10,7 @@ class BooksMapper: Mapper<ProjectResult, BookData>() {
             name = from.title.trim(),
             sort = from.sort,
             usfmUrl = from.formats
-                    .singleOrNull { it.format == "chapterText/usfm" }?.url ?: "",
+                    .singleOrNull { it.format == "text/usfm" }?.url ?: "",
             chapters = listOf()
         )
     }

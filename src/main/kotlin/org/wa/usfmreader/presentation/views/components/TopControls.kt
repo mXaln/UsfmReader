@@ -15,6 +15,8 @@ class TopControls : View("Top") {
 
     val viewModel: MainViewModel by inject()
     var languageCombobox: ComboBox<LanguageData> by singleAssign()
+    var bookCombobox: ComboBox<BookData> by singleAssign()
+    var chapterCombobox: ComboBox<ChapterData> by singleAssign()
 
     override val root = HBox()
 
@@ -69,7 +71,7 @@ class TopControls : View("Top") {
                     }
                 }
 
-                combobox<BookData> {
+                bookCombobox = combobox {
                     items = viewModel.books
                     bind(viewModel.bookProperty)
 
@@ -87,24 +89,33 @@ class TopControls : View("Top") {
             }
 
             vbox {
-                label("Select chapterNumber:") {
+                label("Select chapter:") {
                     style {
                         fontWeight = FontWeight.BOLD
                     }
                 }
-                combobox<ChapterData> {
+                chapterCombobox = combobox {
                     items = viewModel.chapters
                     bind(viewModel.chapterProperty)
 
                     cellFormat {
                         text = it.number.toString()
                     }
-                    selectionModel.selectedItemProperty().onChange {
-                        //viewModel.item = it
-                    }
+
                     useMaxWidth = true
 
-                    //disableWhen { viewModel.bookEmpty }
+                    viewModel.chaptersUpdatedProperty.addListener { _ ->
+                        if (viewModel.chaptersUpdatedProperty.value) {
+                            selectionModel.selectFirst()
+                        }
+                        else {
+                            selectionModel.clearSelection()
+                        }
+                    }
+
+                    disableWhen {
+                        bookCombobox.selectionModel.selectedItemProperty().isNull
+                    }
                 }
             }
         }

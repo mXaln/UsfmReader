@@ -1,18 +1,15 @@
 package org.wa.usfmreader.presentation.views.components
 
+import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.control.ScrollPane
 import javafx.scene.text.FontWeight
-import org.wa.usfmreader.presentation.viewmodel.BookViewModel
-import org.wa.usfmreader.presentation.viewmodel.ChapterViewModel
 import org.wa.usfmreader.presentation.viewmodel.MainViewModel
 import tornadofx.*
 
 class ChapterContent : View("Chapter") {
-    val selectedChapter: ChapterViewModel by inject()
-    val selectedBook: BookViewModel by inject()
-
-    val viewModel: MainViewModel by inject()
+    private val viewModel: MainViewModel by inject()
+    private val topControls: TopControls by inject()
 
     override val root = vbox {
         hbox {
@@ -22,11 +19,13 @@ class ChapterContent : View("Chapter") {
                 fontWeight = FontWeight.BOLD
                 fontSize = 25.px
             }
-            label(viewModel.bookNameProperty)
-            label(viewModel.chapterNumberProperty) {
-//                hiddenWhen {
-//                    selectedBook.empty
-//                }
+            label(viewModel.bookProperty.select { SimpleStringProperty(it.name) })
+            label(viewModel.chapterProperty.select {
+                SimpleStringProperty(it.number.toString())
+            }) {
+                hiddenWhen {
+                    topControls.bookCombobox.selectionModel.selectedItemProperty().isNull
+                }
             }
         }
 
@@ -41,12 +40,14 @@ class ChapterContent : View("Chapter") {
                     fitWidth = 40.0
                     fitHeight = 40.0
                     visibleWhen {
-                        selectedChapter.text.isBlank()
-                                .and(!selectedBook.empty)
+                        topControls.chapterCombobox.selectionModel.selectedItemProperty().isNull
+                                .and(topControls.bookCombobox.selectionModel.selectedItemProperty().isNotNull)
                     }
 
                 }
-                text (selectedChapter.text) {
+                text (viewModel.chapterProperty.select {
+                    SimpleStringProperty(it.text)
+                }) {
                     prefHeight = 600.0
                     wrappingWidth = 1000.0
                     style {

@@ -16,23 +16,17 @@ import org.wa.usfmreader.domain.usecases.LanguagesUsecase
 import tornadofx.*
 
 class MainModel {
-    var chapterNumber: Int by property(1)
-    val chapterNumberProperty = getProperty(MainModel::chapterNumber)
-
-    var chapterText: String by property("")
-    val chapterTextProperty = getProperty(MainModel::chapterText)
-
     var language: LanguageData by property()
     val languageProperty = getProperty(MainModel::language)
 
     var book: BookData by property()
     val bookProperty = getProperty(MainModel::book)
 
-    var bookName: String by property()
-    val bookNameProperty = getProperty(MainModel::bookName)
-
     var chapter: ChapterData by property()
     val chapterProperty = getProperty(MainModel::chapter)
+
+    var chaptersUpdated: Boolean by property()
+    val chaptersUpdatedProperty = getProperty(MainModel::chaptersUpdated)
 
     val languages: ObservableList<LanguageData> =
             mutableListOf<LanguageData>().observable()
@@ -77,21 +71,21 @@ class MainModel {
     }
 
     fun onBookSelected(book: BookData?) {
-        if (book != null) {
-            bookName = book.name
-            chapterText = ""
+        chaptersUpdated = false
 
+        if (book != null) {
             getBook(book)
                     .observeOn(JavaFxScheduler.platform())
                     .subscribeOn(Schedulers.computation())
                     .subscribe {
                         chapters.clear()
                         chapters.addAll(it.chapters)
-                        //chapterViewModel.selectFirst()
+
+                        chaptersUpdated = true
                     }
         }
         else {
-            //chapterViewModel.clear()
+            chaptersUpdated = false
         }
     }
 }
