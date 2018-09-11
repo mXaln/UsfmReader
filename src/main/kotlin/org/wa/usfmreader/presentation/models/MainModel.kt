@@ -35,12 +35,6 @@ class MainModel {
     val chapters: ObservableList<ChapterData> =
             mutableListOf<ChapterData>().observable()
 
-    private val remoteCatalogRepository = RemoteCatalogRepository(CatalogApi())
-    private val languagesUc = LanguagesUsecase(remoteCatalogRepository)
-
-    private val remoteUsfmRepository = RemoteUsfmRepository(UsfmApi())
-    private val bookUc = BookUsecase(remoteUsfmRepository)
-
     init {
         getLanguages()
                 .observeOn(JavaFxScheduler.platform())
@@ -56,10 +50,16 @@ class MainModel {
     }
 
     private fun getLanguages(): Observable<List<LanguageData>> {
+        val remoteCatalogRepository = RemoteCatalogRepository(CatalogApi())
+        val languagesUc = LanguagesUsecase(remoteCatalogRepository)
+
         return languagesUc.getLanguages()
     }
 
-    fun getBook(book: BookData): Observable<BookData> {
+    private fun getBook(book: BookData): Observable<BookData> {
+        val remoteUsfmRepository = RemoteUsfmRepository(UsfmApi())
+        val bookUc = BookUsecase(remoteUsfmRepository)
+
         return bookUc.getBookWithChapters(book)
     }
 
