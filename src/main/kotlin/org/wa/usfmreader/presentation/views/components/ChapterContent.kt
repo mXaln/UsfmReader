@@ -1,5 +1,6 @@
 package org.wa.usfmreader.presentation.views.components
 
+import javafx.beans.binding.Bindings
 import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
 import javafx.scene.control.ScrollPane
@@ -9,7 +10,6 @@ import tornadofx.*
 
 class ChapterContent : View("Chapter") {
     private val viewModel: MainViewModel by inject()
-    private val topControls: TopControls by inject()
 
     override val root = vbox {
         hbox {
@@ -24,7 +24,7 @@ class ChapterContent : View("Chapter") {
                 SimpleStringProperty(it.number.toString())
             }) {
                 hiddenWhen {
-                    topControls.bookCombobox.selectionModel.selectedItemProperty().isNull
+                    Bindings.isNull(viewModel.bookProperty)
                 }
             }
         }
@@ -40,8 +40,8 @@ class ChapterContent : View("Chapter") {
                     fitWidth = 40.0
                     fitHeight = 40.0
                     visibleWhen {
-                        topControls.chapterCombobox.selectionModel.selectedItemProperty().isNull
-                                .and(topControls.bookCombobox.selectionModel.selectedItemProperty().isNotNull)
+                        Bindings.isNull(viewModel.chapterProperty)
+                                .and(Bindings.isNotNull(viewModel.bookProperty))
                     }
 
                 }

@@ -4,14 +4,19 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "gradle.plugin.no.tornado:fxlauncher-gradle-plugin:1.0.20"
     }
 }
 
 apply plugin: "kotlin"
-apply plugin: 'application'
+apply plugin: "application"
+apply plugin: "no.tornado.fxlauncher"
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -44,6 +49,20 @@ dependencies {
 }
 
 mainClassName = 'org.wa.usfmreader.app.MyApp'
+
+sourceSets {
+    main.java.srcDirs += "src/main/kotlin/"
+    test.java.srcDirs += "src/test/kotlin/"
+}
+
+// gradlew deployApp
+fxlauncher {
+    applicationVendor "mXaln"
+    applicationUrl "http://example.com"
+    applicationMainClass "org.wa.usfmreader.app.MyApp"
+    acceptDowngrade false
+    deployTarget "./build/launcher"
+}
 
 jar {
     manifest {

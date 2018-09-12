@@ -9,11 +9,13 @@ import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.ChapterData
 import org.wa.usfmreader.data.entities.LanguageData
 import org.wa.usfmreader.presentation.viewmodel.MainViewModel
+import org.wa.usfmreader.presentation.views.MainView
 import tornadofx.*
 
 class TopControls : View("Top") {
 
     val viewModel: MainViewModel by inject()
+
     var languageCombobox: ComboBox<LanguageData> by singleAssign()
     var bookCombobox: ComboBox<BookData> by singleAssign()
     var chapterCombobox: ComboBox<ChapterData> by singleAssign()
@@ -21,6 +23,7 @@ class TopControls : View("Top") {
     override val root = HBox()
 
     init {
+
         root.apply {
             spacing = 20.0
 
@@ -47,15 +50,11 @@ class TopControls : View("Top") {
 
                     languageCombobox = combobox {
                         items = viewModel.languages
-                        bind(viewModel.languageProperty)
 
                         cellFormat {
                             text = it.name
                         }
 
-                        selectionModel.selectedItemProperty().onChange {
-                            viewModel.handleLanguageSelected(it)
-                        }
                         useMaxWidth = true
                         disableWhen {
                             Bindings.isEmpty(viewModel.languages)
@@ -73,17 +72,14 @@ class TopControls : View("Top") {
 
                 bookCombobox = combobox {
                     items = viewModel.books
-                    bind(viewModel.bookProperty)
 
                     cellFormat {
                         text = it.name
                     }
-                    selectionModel.selectedItemProperty().onChange {
-                        viewModel.handleBookSelected(it)
-                    }
+
                     useMaxWidth = true
                     disableWhen {
-                        languageCombobox.selectionModel.selectedItemProperty().isNull
+                        Bindings.isNull(viewModel.languageProperty)
                     }
                 }
             }
@@ -96,7 +92,6 @@ class TopControls : View("Top") {
                 }
                 chapterCombobox = combobox {
                     items = viewModel.chapters
-                    bind(viewModel.chapterProperty)
 
                     cellFormat {
                         text = it.number.toString()
@@ -104,17 +99,8 @@ class TopControls : View("Top") {
 
                     useMaxWidth = true
 
-                    viewModel.chaptersUpdatedProperty.addListener { _ ->
-                        if (viewModel.chaptersUpdatedProperty.value) {
-                            selectionModel.selectFirst()
-                        }
-                        else {
-                            selectionModel.clearSelection()
-                        }
-                    }
-
                     disableWhen {
-                        bookCombobox.selectionModel.selectedItemProperty().isNull
+                        Bindings.isEmpty(viewModel.chapters)
                     }
                 }
             }

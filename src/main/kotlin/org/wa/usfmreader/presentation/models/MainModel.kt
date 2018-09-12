@@ -25,9 +25,6 @@ class MainModel {
     var chapter: ChapterData by property()
     val chapterProperty = getProperty(MainModel::chapter)
 
-    var chaptersUpdated: Boolean by property()
-    val chaptersUpdatedProperty = getProperty(MainModel::chaptersUpdated)
-
     val languages: ObservableList<LanguageData> =
             mutableListOf<LanguageData>().observable()
     val books: ObservableList<BookData> =
@@ -40,11 +37,8 @@ class MainModel {
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
                 .subscribe { it ->
-                    val newLangs = it
-                            .sortedBy { it.name }
-
                     languages.clear()
-                    languages.addAll(newLangs)
+                    languages.addAll(it.sortedBy { it.name })
                 }
 
     }
@@ -63,29 +57,37 @@ class MainModel {
         return bookUc.getBookWithChapters(book)
     }
 
-    fun onLanguageSelected(language: LanguageData?) {
-        if (language != null) {
-            books.clear()
-            books.addAll(language.books)
+    fun onLanguageSelected(language: LanguageData) {
+        chapters.clear()
+        books.clear()
+        books.setAll(language.books)
+    }
+
+    fun onBookSelected(book: BookData) {
+        chapters.clear()
+        getBook(book)
+                .observeOn(JavaFxScheduler.platform())
+                .subscribeOn(Schedulers.computation())
+                .subscribe {
+                    chapters.setAll(it.chapters)
+                }
+    }
+
+    fun onNextChapterClick() {
+        val nextChapter = chapters
+                .singleOrNull { it.number == chapter.number + 1 }
+
+        if (nextChapter != null) {
+            chapter = nextChapter
         }
     }
 
-    fun onBookSelected(book: BookData?) {
-        chaptersUpdated = false
+    fun onPreviousChapterClick() {
+        val prevChapter = chapters
+                .singleOrNull { it.number == chapter.number - 1 }
 
-        if (book != null) {
-            getBook(book)
-                    .observeOn(JavaFxScheduler.platform())
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe {
-                        chapters.clear()
-                        chapters.addAll(it.chapters)
-
-                        chaptersUpdated = true
-                    }
-        }
-        else {
-            chaptersUpdated = false
+        if (prevChapter != null) {
+            chapter = prevChapter
         }
     }
 }
