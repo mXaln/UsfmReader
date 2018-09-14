@@ -1,6 +1,5 @@
 package org.wa.usfmreader.presentation.models
 
-import io.reactivex.Observable
 import io.reactivex.rxjavafx.schedulers.JavaFxScheduler
 import io.reactivex.schedulers.Schedulers
 import javafx.collections.ObservableList
@@ -16,65 +15,45 @@ import org.wa.usfmreader.domain.usecases.LanguagesUsecase
 import tornadofx.*
 
 class MainModel {
-    var language: LanguageData by property()
+    private var language: LanguageData by property()
     val languageProperty = getProperty(MainModel::language)
 
-    var book: BookData by property()
+    private var book: BookData by property()
     val bookProperty = getProperty(MainModel::book)
 
-    var chapter: ChapterData by property()
+    private var chapter: ChapterData by property()
     val chapterProperty = getProperty(MainModel::chapter)
 
     val languages: ObservableList<LanguageData> =
             mutableListOf<LanguageData>().observable()
-    val books: ObservableList<BookData> =
-            mutableListOf<BookData>().observable()
-    val chapters: ObservableList<ChapterData> =
-            mutableListOf<ChapterData>().observable()
+
+    private val bookUc = BookUsecase(RemoteUsfmRepository(UsfmApi()))
+    private val languagesUc = LanguagesUsecase(RemoteCatalogRepository(CatalogApi()))
 
     init {
-        getLanguages()
+        languagesUc.getLanguages()
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
                 .subscribe { it ->
                     languages.clear()
                     languages.addAll(it.sortedBy { it.name })
                 }
-
-    }
-
-    private fun getLanguages(): Observable<List<LanguageData>> {
-        val remoteCatalogRepository = RemoteCatalogRepository(CatalogApi())
-        val languagesUc = LanguagesUsecase(remoteCatalogRepository)
-
-        return languagesUc.getLanguages()
-    }
-
-    private fun getBook(book: BookData): Observable<BookData> {
-        val remoteUsfmRepository = RemoteUsfmRepository(UsfmApi())
-        val bookUc = BookUsecase(remoteUsfmRepository)
-
-        return bookUc.getBookWithChapters(book)
     }
 
     fun onLanguageSelected(language: LanguageData) {
-        chapters.clear()
-        books.clear()
-        books.setAll(language.books)
     }
 
     fun onBookSelected(book: BookData) {
-        chapters.clear()
-        getBook(book)
+        bookUc.getBookWithChapters(book)
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
                 .subscribe {
-                    chapters.setAll(it.chapters)
+                    this.book = it
                 }
     }
 
     fun onNextChapterClick() {
-        val nextChapter = chapters
+        val nextChapter = book.chapters
                 .singleOrNull { it.number == chapter.number + 1 }
 
         if (nextChapter != null) {
@@ -83,7 +62,7 @@ class MainModel {
     }
 
     fun onPreviousChapterClick() {
-        val prevChapter = chapters
+        val prevChapter = book.chapters
                 .singleOrNull { it.number == chapter.number - 1 }
 
         if (prevChapter != null) {

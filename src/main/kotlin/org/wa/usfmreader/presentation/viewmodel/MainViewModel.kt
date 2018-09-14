@@ -19,8 +19,6 @@ class MainViewModel: ViewModel() {
             bind(autocommit = true) { model.chapterProperty }
 
     val languages = model.languages
-    val books = model.books
-    val chapters = model.chapters
 
     fun handleLanguageSelected(language: LanguageData) {
         model.onLanguageSelected(language)

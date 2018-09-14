@@ -1,15 +1,18 @@
 package org.wa.usfmreader.presentation.views.components
 
-import javafx.beans.binding.Bindings
-import javafx.beans.property.SimpleStringProperty
 import javafx.geometry.Pos
+import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
+import javafx.scene.image.ImageView
 import javafx.scene.text.FontWeight
-import org.wa.usfmreader.presentation.viewmodel.MainViewModel
+import javafx.scene.text.Text
 import tornadofx.*
 
 class ChapterContent : View("Chapter") {
-    private val viewModel: MainViewModel by inject()
+    var bookLabel: Label by singleAssign()
+    var chapterLabel: Label by singleAssign()
+    var imageLoader: ImageView by singleAssign()
+    var chapterText: Text by singleAssign()
 
     override val root = vbox {
         hbox {
@@ -19,14 +22,8 @@ class ChapterContent : View("Chapter") {
                 fontWeight = FontWeight.BOLD
                 fontSize = 25.px
             }
-            label(viewModel.bookProperty.select { SimpleStringProperty(it.name) })
-            label(viewModel.chapterProperty.select {
-                SimpleStringProperty(it.number.toString())
-            }) {
-                hiddenWhen {
-                    Bindings.isNull(viewModel.bookProperty)
-                }
-            }
+            bookLabel = label()
+            chapterLabel = label()
         }
 
         scrollpane {
@@ -36,18 +33,12 @@ class ChapterContent : View("Chapter") {
 
             stackpane {
 
-                imageview("loader.gif") {
+                imageLoader = imageview("loader.gif") {
                     fitWidth = 40.0
                     fitHeight = 40.0
-                    visibleWhen {
-                        Bindings.isNull(viewModel.chapterProperty)
-                                .and(Bindings.isNotNull(viewModel.bookProperty))
-                    }
 
                 }
-                text (viewModel.chapterProperty.select {
-                    SimpleStringProperty(it.text)
-                }) {
+                chapterText = text {
                     prefHeight = 600.0
                     wrappingWidth = 1000.0
                     style {
