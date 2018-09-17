@@ -1,15 +1,18 @@
-package org.wa.usfmreader.presentation.views
+package org.wa.usfmreader.presentation.views.components
 
 import javafx.geometry.Pos
+import javafx.scene.control.Label
 import javafx.scene.control.ScrollPane
+import javafx.scene.image.ImageView
 import javafx.scene.text.FontWeight
-import org.wa.usfmreader.presentation.viewmodel.BookViewModel
-import org.wa.usfmreader.presentation.viewmodel.ChapterViewModel
+import javafx.scene.text.Text
 import tornadofx.*
 
 class ChapterContent : View("Chapter") {
-    val selectedChapter: ChapterViewModel by inject()
-    val selectedBook: BookViewModel by inject()
+    var bookLabel: Label by singleAssign()
+    var chapterLabel: Label by singleAssign()
+    var imageLoader: ImageView by singleAssign()
+    var chapterText: Text by singleAssign()
 
     override val root = vbox {
         hbox {
@@ -19,12 +22,8 @@ class ChapterContent : View("Chapter") {
                 fontWeight = FontWeight.BOLD
                 fontSize = 25.px
             }
-            label(selectedBook.name)
-            label(selectedChapter.number) {
-                hiddenWhen {
-                    selectedBook.empty
-                }
-            }
+            bookLabel = label()
+            chapterLabel = label()
         }
 
         scrollpane {
@@ -34,16 +33,12 @@ class ChapterContent : View("Chapter") {
 
             stackpane {
 
-                imageview("loader.gif") {
-                    fitWidth = 50.0
-                    fitHeight = 50.0
-                    visibleWhen {
-                        selectedChapter.text.isBlank()
-                                .and(!selectedBook.empty)
-                    }
+                imageLoader = imageview("loader.gif") {
+                    fitWidth = 40.0
+                    fitHeight = 40.0
 
                 }
-                text (selectedChapter.text) {
+                chapterText = text {
                     prefHeight = 600.0
                     wrappingWidth = 1000.0
                     style {
