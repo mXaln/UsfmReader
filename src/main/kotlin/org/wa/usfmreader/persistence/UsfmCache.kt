@@ -9,10 +9,17 @@ import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.LanguageData
 import java.io.File
 
-const val USFM_STORAGE_PATH = "."
 
 class UsfmCache {
+    private val homeDir = System.getProperty("user.home")
+    private val usfmStoragePath = homeDir + File.separator + ".UsfmReader"
     private val db = SqliteDB()
+
+    init {
+        if (!File(usfmStoragePath).exists()) {
+            File(usfmStoragePath).mkdir()
+        }
+    }
 
     fun getBookUsfm(book: BookData, language: LanguageData): Observable<String> {
         val result = db.DSL().select()
@@ -23,18 +30,22 @@ class UsfmCache {
                 .fetchOne()
 
         if (result != null) {
-            val location = USFM_STORAGE_PATH + File.separator + language.slug + "_" + book.slug + ".usfm"
-            File(location).bufferedReader()
-                    .use { out ->
-                        val usfm = out.readText()
-                        return Observable.just(usfm)
-                    }
+            val location = usfmStoragePath + File.separator + language.slug + "_" + book.slug + ".usfm"
+            try {
+                File(location).bufferedReader()
+                        .use { out ->
+                            val usfm = out.readText()
+                            return Observable.just(usfm)
+                        }
+            } catch (e: Exception) {
+                println(e.message)
+            }
         }
         return Observable.just("")
     }
 
     fun saveBookUsfm(book: BookData, language: LanguageData, usfm: String) {
-        val location = USFM_STORAGE_PATH + File.separator + language.slug + "_" + book.slug + ".usfm"
+        val location = usfmStoragePath + File.separator + language.slug + "_" + book.slug + ".usfm"
         File(location).bufferedWriter()
                 .use { out ->
                     out.write(usfm)
@@ -42,7 +53,6 @@ class UsfmCache {
 
         if (File(location).exists()) {
             val languageResult = saveLanguageToDB(language)
-            println(languageResult)
             if (languageResult != null) {
                 val booksResult = saveBookToDB(book, languageResult.getValue(LANGUAGES.ID), location)
 

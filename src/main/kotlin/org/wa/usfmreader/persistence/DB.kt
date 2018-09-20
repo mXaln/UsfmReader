@@ -6,5 +6,6 @@ import java.sql.Connection
 interface DB {
     fun connection(): Connection
     fun DSL(): DSLContext
+    fun createDatabase()
     fun close()
 }

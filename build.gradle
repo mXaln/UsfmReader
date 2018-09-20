@@ -25,6 +25,10 @@ apply plugin: "application"
 apply plugin: "no.tornado.fxlauncher"
 apply plugin: "nu.studer.jooq"
 
+configurations {
+    driver
+}
+
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
@@ -58,6 +62,8 @@ dependencies {
     jooqRuntime "org.jooq:jooq-meta-extensions:$jooq_version"
 
     testCompile "junit:junit:4.12"
+
+    driver "org.xerial:sqlite-jdbc:$sqlite_jdbc_version"
 }
 
 mainClassName = "org.wa.usfmreader.app.MyApp"
@@ -76,26 +82,46 @@ fxlauncher {
     deployTarget "./build/launcher"
 }
 
+task createDatabase {
+    URLClassLoader loader = GroovyObject.class.classLoader
+    configurations.driver.each {File file -> loader.addURL(file.toURI().toURL())}
+
+    ext.loadScript = { sql, file ->
+        String[] sqlcmds = file.text.split(";")
+        sqlcmds.collect{it.trim()}.findAll{!it.isEmpty() && !it.startsWith("--")}.each {
+            try {
+                sql.execute(it)
+            } catch(java.sql.SQLException e) {
+                //println(e.message)
+            }
+        }
+    }
+
+    def sqlLocation = "src" + File.separator + "main" + File.separator + "resources"
+    def sql = groovy.sql.Sql.newInstance("jdbc:sqlite:ureader.sqlite","","","org.sqlite.JDBC")
+    new File(sqlLocation).eachFileMatch(~/.*\.sql/) { loadScript(sql, it) }
+    sql.close()
+}
+
 jooq {
     version = "$jooq_version"
-    edition = 'OSS'
-    sample(sourceSets.main) {
+    edition = "OSS"
+    config(sourceSets.main) {
         jdbc {
-            driver = 'org.sqlite.JDBC'
-            url = 'jdbc:sqlite:ureader.sqlite'
+            driver = "org.sqlite.JDBC"
+            url = "jdbc:sqlite:ureader.sqlite"
         }
         generator {
             database {
-                name = 'org.jooq.meta.sqlite.SQLiteDatabase'
+                name = "org.jooq.meta.sqlite.SQLiteDatabase"
             }
             generate {
                 pojos = true
                 daos = true
             }
-
             target {
-                packageName = 'jooq'
-                directory = 'src/main/java'
+                packageName = "jooq"
+                directory = "src/main/java"
             }
         }
     }
@@ -115,3 +141,6 @@ jar {
         exclude "META-INF/*.RSA"
     }
 }
+
+generateConfigJooqSchemaSource.dependsOn createDatabase
+compileKotlin.dependsOn generateConfigJooqSchemaSource

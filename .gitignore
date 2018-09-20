@@ -59,6 +59,7 @@ gradle-app.setting
 \# \# Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 \# gradle/wrapper/gradle-wrapper.properties
 
-#/src/main/java
+/src/main/java
 *.usfm
+*.sqlite
 

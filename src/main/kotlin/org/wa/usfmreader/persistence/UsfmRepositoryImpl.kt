@@ -13,7 +13,6 @@ class UsfmRepositoryImpl {
     fun getBookUsfm(book: BookData, language: LanguageData): Observable<String> {
         return localUsfmRepository.getBookUsfm(book, language)
                 .flatMap {
-                    println(it)
                     if (it.isNotEmpty()) {
                         Observable.just(it)
                     } else {
