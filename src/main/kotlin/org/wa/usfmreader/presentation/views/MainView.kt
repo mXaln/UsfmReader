@@ -1,5 +1,6 @@
 package org.wa.usfmreader.presentation.views
 
+import com.github.thomasnield.rxkotlinfx.toNullableObservable
 import javafx.beans.binding.Bindings
 import javafx.geometry.Insets
 import javafx.geometry.Pos
@@ -85,7 +86,7 @@ class MainView : View("Bible Reader") {
 
         topControls.chapterCombobox.bind(viewModel.chapterProperty)
         topControls.chapterCombobox.disableWhen {
-            Bindings.isNull(viewModel.chapterProperty)
+            Bindings.isNull(viewModel.bookProperty)
         }
 
         // --------- Chapter Content --------- //
@@ -96,11 +97,13 @@ class MainView : View("Bible Reader") {
             chapterContent.chapterLabel.text = it?.number.toString()
         }
         chapterContent.chapterLabel.hiddenWhen {
-            Bindings.isNull(viewModel.bookProperty)
+            viewModel.bookLoadingProperty
         }
         chapterContent.imageLoader.visibleWhen {
-            Bindings.isNull(viewModel.chapterProperty)
-                    .and(Bindings.isNotNull(viewModel.bookProperty))
+            viewModel.bookLoadingProperty
+        }
+        chapterContent.chapterText.hiddenWhen {
+            viewModel.bookLoadingProperty
         }
         viewModel.chapterProperty.onChange {
             chapterContent.chapterText.text = it?.text
