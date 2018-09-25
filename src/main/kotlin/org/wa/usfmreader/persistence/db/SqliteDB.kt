@@ -1,15 +1,19 @@
-package org.wa.usfmreader.persistence
+package org.wa.usfmreader.persistence.db
 
+import org.jooq.Configuration
 import org.jooq.DSLContext
+import org.jooq.SQLDialect
 import org.jooq.impl.DSL
+import org.jooq.impl.DefaultConfiguration
 import java.io.File
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Statement
 
+
 class SqliteDB: DB {
     private val homeDir = System.getProperty("user.home")
-    private val dbPath = homeDir + File.separator + ".UsfmReader" + File.separator + "ureader.sqlite"
+    private val dbPath = listOf(homeDir, ".UsfmReader", "ureader.sqlite").joinToString(File.separator)
     private val url: String = "jdbc:sqlite:$dbPath"
     private lateinit var connection: Connection
 
@@ -26,7 +30,11 @@ class SqliteDB: DB {
         return connection
     }
 
-    override fun DSL(): DSLContext {
+    override fun configuration(): Configuration {
+        return DefaultConfiguration().set(connection).set(SQLDialect.SQLITE)
+    }
+
+    override fun dsl(): DSLContext {
         return DSL.using(connection)
     }
 

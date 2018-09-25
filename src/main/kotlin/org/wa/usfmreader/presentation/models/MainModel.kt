@@ -10,7 +10,6 @@ import org.wa.usfmreader.data.entities.ChapterData
 import org.wa.usfmreader.data.entities.LanguageData
 import org.wa.usfmreader.domain.usecases.BookUsecase
 import org.wa.usfmreader.domain.usecases.LanguagesUsecase
-import org.wa.usfmreader.persistence.UsfmRepositoryImpl
 import tornadofx.*
 
 
@@ -30,11 +29,9 @@ class MainModel {
     val languages: ObservableList<LanguageData> =
             mutableListOf<LanguageData>().observable()
 
-    private val languagesUc = LanguagesUsecase(RemoteCatalogRepository(CatalogApi()))
-    private val bookUc = BookUsecase(UsfmRepositoryImpl())
-
     init {
-        languagesUc.getLanguages()
+        LanguagesUsecase(RemoteCatalogRepository(CatalogApi()))
+                .getLanguages()
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
                 .onErrorReturn { languages }
@@ -51,10 +48,12 @@ class MainModel {
 
     fun onBookSelected(book: BookData) {
         bookLoading = true
-        bookUc.getBookWithChapters(book, language)
+        BookUsecase().getBookWithChapters(book, language)
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
-                .onErrorReturn { book }
+                .onErrorReturn {
+                    book
+                }
                 .subscribe {
                     this.book = it
                     bookLoading = false

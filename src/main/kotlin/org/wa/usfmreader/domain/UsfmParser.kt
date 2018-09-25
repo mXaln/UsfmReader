@@ -1,16 +1,13 @@
 package org.wa.usfmreader.domain
 
-import io.reactivex.Observable
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.ChapterData
 
 class UsfmParser {
 
-    fun parse(usfm: Observable<String>, book: BookData): Observable<BookData> {
-        return usfm.map {
-            book.chapters = getChapters(it)
-            book
-        }
+    fun parse(usfm: String, book: BookData): BookData {
+        book.chapters = getChapters(usfm)
+        return book
     }
 
     private fun isChapterTag(text: String): Boolean {

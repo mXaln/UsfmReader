@@ -1,11 +1,12 @@
-package org.wa.usfmreader.persistence
+package org.wa.usfmreader.persistence.db
 
 import org.jooq.*
 import java.sql.Connection
 
 interface DB {
     fun connection(): Connection
-    fun DSL(): DSLContext
+    fun configuration(): Configuration
+    fun dsl(): DSLContext
     fun createDatabase()
     fun close()
 }
