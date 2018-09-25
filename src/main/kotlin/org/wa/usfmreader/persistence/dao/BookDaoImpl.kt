@@ -7,7 +7,8 @@ import jooq.Tables
 import jooq.tables.daos.BookDao
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.LanguageData
-import org.wa.usfmreader.persistence.db.SqliteDB
+import org.wa.usfmreader.domain.dao.AppBookDao
+import org.wa.usfmreader.domain.db.SqliteDB
 import org.wa.usfmreader.persistence.mappers.BooksDaoMapper
 
 class BookDaoImpl: AppBookDao {
@@ -20,7 +21,7 @@ class BookDaoImpl: AppBookDao {
             mapper.mapFromBook(
                     bookDao.fetchBySlug(slug).first()
             )
-        }
+        }.onErrorComplete()
     }
 
     /***
@@ -63,7 +64,7 @@ class BookDaoImpl: AppBookDao {
         }
     }
 
-    override fun fetchAllBySlug(slug: String): Single<List<BookData>> {
+    override fun fetchBySlug(slug: String): Single<List<BookData>> {
         return Single.fromCallable {
             bookDao.fetchBySlug(slug).map {
                 mapper.mapFromBook(it)
@@ -78,11 +79,10 @@ class BookDaoImpl: AppBookDao {
                 book.languageId = languageId
                 book.location = location
                 bookDao.insert(book)
-                bookDao.fetchBySlug(obj.slug).first().id
             } catch (e: Exception) {
                 println(e.message)
-                bookDao.fetchBySlug(obj.slug).first().id
             }
+            bookDao.fetchBySlug(obj.slug).first().id
         }
     }
 

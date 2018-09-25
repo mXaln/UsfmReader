@@ -1,6 +1,9 @@
 package org.wa.usfmreader.persistence
 
 import io.reactivex.Maybe
+import org.wa.usfmreader.data.entities.BookData
+import org.wa.usfmreader.data.entities.LanguageData
+import org.wa.usfmreader.domain.UsfmFileIO
 import java.io.File
 
 class UsfmFile: UsfmFileIO {
@@ -13,8 +16,8 @@ class UsfmFile: UsfmFileIO {
         }
     }
 
-    override fun getUsfm(filename: String): Maybe<String> {
-        val location = listOf(usfmStoragePath, filename)
+    override fun getUsfm(language: LanguageData, book: BookData): Maybe<String> {
+        val location = listOf(usfmStoragePath, language.slug + "_" + book.slug + ".usfm")
                 .joinToString(File.separator)
         try {
             return Maybe.fromCallable {
@@ -25,12 +28,12 @@ class UsfmFile: UsfmFileIO {
             }
         } catch (e: Exception) {
             println(e.message)
-            return Maybe.just("")
+            return Maybe.empty()
         }
     }
 
-    override fun saveUsfm(filename: String, usfm: String): Maybe<String> {
-        val location = listOf(usfmStoragePath, filename)
+    override fun saveUsfm(language: LanguageData, book: BookData, usfm: String): Maybe<String> {
+        val location = listOf(usfmStoragePath, language.slug + "_" + book.slug + ".usfm")
                 .joinToString(File.separator)
         return Maybe.fromCallable {
             File(location).bufferedWriter()

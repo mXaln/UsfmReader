@@ -1,4 +1,4 @@
-package org.wa.usfmreader.persistence.db
+package org.wa.usfmreader.domain.db
 
 import org.jooq.Configuration
 import org.jooq.DSLContext

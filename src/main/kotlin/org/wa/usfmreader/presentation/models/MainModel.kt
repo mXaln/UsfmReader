@@ -5,11 +5,16 @@ import io.reactivex.schedulers.Schedulers
 import javafx.collections.ObservableList
 import org.wa.usfmreader.api.CatalogApi
 import org.wa.usfmreader.api.RemoteCatalogRepository
+import org.wa.usfmreader.api.RemoteUsfmRepositoryImpl
+import org.wa.usfmreader.api.UsfmApi
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.ChapterData
 import org.wa.usfmreader.data.entities.LanguageData
 import org.wa.usfmreader.domain.usecases.BookUsecase
 import org.wa.usfmreader.domain.usecases.LanguagesUsecase
+import org.wa.usfmreader.persistence.LocalUsfmRepositoryImpl
+import org.wa.usfmreader.persistence.UsfmFile
+import org.wa.usfmreader.persistence.db.AppDatabaseImpl
 import tornadofx.*
 
 
@@ -48,7 +53,13 @@ class MainModel {
 
     fun onBookSelected(book: BookData) {
         bookLoading = true
-        BookUsecase().getBookWithChapters(book, language)
+        BookUsecase(
+                LocalUsfmRepositoryImpl(
+                        UsfmFile(),
+                        AppDatabaseImpl()
+                ),
+                RemoteUsfmRepositoryImpl(UsfmApi())
+        ).getBookWithChapters(book, language)
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
                 .onErrorReturn {

@@ -3,21 +3,21 @@ package org.wa.usfmreader.persistence
 import io.reactivex.Maybe
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.LanguageData
-import org.wa.usfmreader.domain.UsfmRepository
+import org.wa.usfmreader.domain.LocalUsfmRepository
 import org.wa.usfmreader.persistence.db.AppDatabaseImpl
 
-class LocalUsfmRepository(private val usfmFile: UsfmFile,
-                          private val database: AppDatabaseImpl): UsfmRepository {
+class LocalUsfmRepositoryImpl(private val usfmFile: UsfmFile,
+                              private val database: AppDatabaseImpl): LocalUsfmRepository {
 
     override fun getBookUsfm(book: BookData, language: LanguageData): Maybe<String> {
         return database.getBookDao().fetchOneByBookAndLanguage(book, language)
                 .flatMap {
-                    usfmFile.getUsfm(language.slug + "_" + book.slug + ".usfm")
+                    usfmFile.getUsfm(language, book)
                 }
     }
 
-    fun saveBookUsfm(book: BookData, language: LanguageData, usfm: String): Maybe<String> {
-        return usfmFile.saveUsfm(language.slug + "_" + book.slug + ".usfm", usfm)
+    override fun saveBookUsfm(book: BookData, language: LanguageData, usfm: String): Maybe<String> {
+        return usfmFile.saveUsfm(language, book, usfm)
                 .flatMap {
                     val location = it
                     database.getLanguageDao().insert(language)

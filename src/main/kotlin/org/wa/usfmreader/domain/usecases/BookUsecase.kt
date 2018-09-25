@@ -1,37 +1,29 @@
 package org.wa.usfmreader.domain.usecases
 
 import io.reactivex.Maybe
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
-import org.wa.usfmreader.api.RemoteUsfmRepository
-import org.wa.usfmreader.api.UsfmApi
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.LanguageData
+import org.wa.usfmreader.domain.LocalUsfmRepository
 import org.wa.usfmreader.domain.UsfmParser
-import org.wa.usfmreader.persistence.LocalUsfmRepository
-import org.wa.usfmreader.persistence.UsfmFile
-import org.wa.usfmreader.persistence.db.AppDatabaseImpl
+import org.wa.usfmreader.domain.UsfmRepository
 
-class BookUsecase {
-    private val localUsfmRepository = LocalUsfmRepository(
-            UsfmFile(),
-            AppDatabaseImpl()
-    )
-    private val remoteUsfmRepository = RemoteUsfmRepository(UsfmApi())
+class BookUsecase(private var localUsfmRepository: LocalUsfmRepository,
+                  private var remoteUsfmRepository: UsfmRepository) {
 
     fun getBookWithChapters(book: BookData, language: LanguageData): Maybe<BookData> {
         return localUsfmRepository.getBookUsfm(book, language)
-                .flatMap {
-                    Maybe.fromCallable {
-                        UsfmParser().parse(it, book)
-                    }
+                .map {
+                    UsfmParser().parse(it, book)
                 }
                 .onErrorResumeNext { _: Throwable ->
                     remoteUsfmRepository.getBookUsfm(book, language)
                             .flatMap {
+                                val usfm = it
                                 localUsfmRepository.saveBookUsfm(book, language, it)
-                                        .subscribe()
-                                Maybe.just(UsfmParser().parse(it, book))
+                                        .flatMap {
+                                            Maybe.just(UsfmParser().parse(usfm, book))
+                                        }
+
                             }
                 }
     }
