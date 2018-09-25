@@ -5,14 +5,18 @@ import io.reactivex.schedulers.Schedulers
 import javafx.collections.ObservableList
 import org.wa.usfmreader.api.CatalogApi
 import org.wa.usfmreader.api.RemoteCatalogRepository
-import org.wa.usfmreader.api.RemoteUsfmRepository
+import org.wa.usfmreader.api.RemoteUsfmRepositoryImpl
 import org.wa.usfmreader.api.UsfmApi
 import org.wa.usfmreader.data.entities.BookData
 import org.wa.usfmreader.data.entities.ChapterData
 import org.wa.usfmreader.data.entities.LanguageData
 import org.wa.usfmreader.domain.usecases.BookUsecase
 import org.wa.usfmreader.domain.usecases.LanguagesUsecase
+import org.wa.usfmreader.persistence.LocalUsfmRepositoryImpl
+import org.wa.usfmreader.persistence.UsfmFile
+import org.wa.usfmreader.persistence.db.AppDatabaseImpl
 import tornadofx.*
+
 
 class MainModel {
     private var language: LanguageData by property()
@@ -24,31 +28,46 @@ class MainModel {
     private var chapter: ChapterData by property()
     val chapterProperty = getProperty(MainModel::chapter)
 
+    private var bookLoading: Boolean by property()
+    val bookLoadingProperty = getProperty(MainModel::bookLoading)
+
     val languages: ObservableList<LanguageData> =
             mutableListOf<LanguageData>().observable()
 
-    private val bookUc = BookUsecase(RemoteUsfmRepository(UsfmApi()))
-    private val languagesUc = LanguagesUsecase(RemoteCatalogRepository(CatalogApi()))
-
     init {
-        languagesUc.getLanguages()
+        LanguagesUsecase(RemoteCatalogRepository(CatalogApi()))
+                .getLanguages()
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
+                .onErrorReturn { languages }
                 .subscribe { it ->
                     languages.clear()
                     languages.addAll(it.sortedBy { it.name })
                 }
+
     }
 
     fun onLanguageSelected(language: LanguageData) {
+        println(language.name)
     }
 
     fun onBookSelected(book: BookData) {
-        bookUc.getBookWithChapters(book)
+        bookLoading = true
+        BookUsecase(
+                LocalUsfmRepositoryImpl(
+                        UsfmFile(),
+                        AppDatabaseImpl()
+                ),
+                RemoteUsfmRepositoryImpl(UsfmApi())
+        ).getBookWithChapters(book, language)
                 .observeOn(JavaFxScheduler.platform())
                 .subscribeOn(Schedulers.computation())
+                .onErrorReturn {
+                    book
+                }
                 .subscribe {
                     this.book = it
+                    bookLoading = false
                 }
     }
 

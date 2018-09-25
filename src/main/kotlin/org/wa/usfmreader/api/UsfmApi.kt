@@ -1,5 +1,6 @@
 package org.wa.usfmreader.api
 
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -31,7 +32,7 @@ class UsfmApi {
     }
 
 
-    fun getBookUsfm(usfmUrl: String): Observable<String> {
+    fun getBookUsfm(usfmUrl: String): Maybe<String> {
         return usfmClient.getBookUsfm(usfmUrl)
     }
 }

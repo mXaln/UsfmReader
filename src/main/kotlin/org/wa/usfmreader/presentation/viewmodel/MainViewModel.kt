@@ -18,6 +18,8 @@ class MainViewModel: ViewModel() {
     var chapterProperty: ObservableObjectValue<ChapterData> =
             bind(autocommit = true) { model.chapterProperty }
 
+    var bookLoadingProperty = bind { model.bookLoadingProperty }
+
     val languages = model.languages
 
     fun handleLanguageSelected(language: LanguageData) {

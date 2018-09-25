@@ -33,6 +33,8 @@ class ChapterContent : View("Chapter") {
 
             stackpane {
 
+                alignment = Pos.TOP_CENTER
+
                 imageLoader = imageview("loader.gif") {
                     fitWidth = 40.0
                     fitHeight = 40.0
